@@ -8,7 +8,7 @@ pip install pyinstaller PyQt6
 
 Write-Host "`nBuilding Sinking Funds Manager..." -ForegroundColor Cyan
 # The --add-data flag ensures the icon.svg is bundled with the executable so the window icon still loads.
-& pyinstaller --noconsole --windowed --name="Sinking Funds Manager" --add-data "icon.svg;." main.py
+python -m PyInstaller --noconsole --windowed --name="Sinking Funds Manager" --add-data "icon.svg;." main.py
 
 Write-Host "`n=======================================================" -ForegroundColor Green
 Write-Host "Build complete!" -ForegroundColor Green
