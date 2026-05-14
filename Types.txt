@@ -1,0 +1,4 @@
+Savings, Red
+Expenses, Green
+Credit Card, Blue
+Other, Black

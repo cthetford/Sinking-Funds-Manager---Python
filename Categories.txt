@@ -1,0 +1,85 @@
+Primary Savings,Dining,N,Expenses
+Primary Savings,Electricity,N,Expenses
+Primary Savings,Pet Expenses,N,Savings
+Primary Savings,Christmas,Y,Savings
+Primary Savings,Misc,Y,Savings
+Primary Savings,Home Maintenance,N,Savings
+Primary Savings,Other Credit Card,N,Credit Card
+Primary Savings,Costco Visa,N,Credit Card
+Primary Savings,Amazon Prime,N,Credit Card
+Primary Savings,Amex Blue,Y,Credit Card
+Primary Savings,Fuel,N,Expenses
+Primary Savings,Taxes,N,Savings
+Primary Savings,Johnette Discretionary,N,Savings
+Primary Savings,Curtis Discretionary,N,Savings
+Primary Savings,Tuition Rachel,Y,Savings
+Primary Savings,Health Care,Y,Expenses
+Primary Savings,Discover,N,Credit Card
+Primary Savings,House Supplies,N,Expenses
+Primary Savings,Entertainment,N,Expenses
+Primary Savings,Sams Mastercard,N,Credit Card
+Primary Savings,Band,Y,Expenses
+Primary Savings,Gifts,N,Savings
+Primary Savings,Kohl's,N,Credit Card
+Primary Savings,Car Insurance,Y,Expenses
+Primary Savings,Kids Activities,Y,Expenses
+Primary Savings,Personal Care,N,Expenses
+Primary Savings,Pool Supplies,N,Expenses
+Primary Savings,Clothes,N,Expenses
+Primary Savings,Savings,N,Savings
+Primary Savings,Future Payday,N,Other
+Primary Savings,Tuition Caleb,Y,Savings
+Primary Savings,Travel,N,Savings
+Primary Savings,Groceries,N,Expenses
+Primary Savings,J C Penney,N,Credit Card
+Primary Savings,Macys,N,Credit Card
+Primary Savings,Charity,N,Savings
+Primary Savings,Emergency Fund,N,Savings
+Primary Savings,Homeowner's Insurance,N,Savings
+Primary Savings,Auto Insurance,N,Savings
+Primary Savings,Umbrella Insurance,N,Savings
+Primary Savings,Andrew College,Y 	,Savings
+Primary Savings,Caleb Charger,Y,Savings
+Primary Savings,Auto Expenses,N,Savings
+Primary Savings,Tolls,N,Expenses
+Primary Savings,Caleb Phone,Y,Expenses
+Primary Savings,Caleb Loan,N,Savings
+Primary Savings,Caleb Car Repair,Y,Savings
+Secondary Savings,Home Maintenance,N,Savings
+Secondary Savings,Auto Expenses,N,Savings
+Secondary Savings,Emergency Fund,N,Savings
+Secondary Savings,College,N,Savings
+Secondary Savings,Taxes,N,Savings
+Secondary Savings,Savings,N,Savings
+Secondary Savings,Johnette Discretionary,N,Savings
+Secondary Savings,Travel,N,Savings
+Z CD,Home Maintenance,N,Savings
+Z CD,Auto Expenses,N,Savings
+Z CD,Emergency Fund,N,Savings
+Z CD,College,N,Savings
+Z CD,Taxes,N,Savings
+Z CD,Savings,N,Savings
+Z CD,Johnette Discretionary,N,Savings
+Z CD,Travel,N,Savings
+Z CD,Caleb Car Repair,N,Savings
+Z CD - 6 Month,Home Maintenance,N,Savings
+Z CD - 6 Month,Emergency Fund,N,Savings
+Z CD - 6 Month,Savings,N,Savings
+Fidelity,Misc,Y,Savings
+Fidelity,Home Maintenance,N,Savings
+Fidelity,Taxes,N,Savings
+Fidelity,Johnette Discretionary,N,Savings
+Fidelity,Health Care,Y,Expenses
+Fidelity,Discover,N,Credit Card
+Fidelity,House Supplies,N,Expenses
+Fidelity,Gifts,N,Savings
+Fidelity,Pool Supplies,N,Expenses
+Fidelity,Savings,N,Savings
+Fidelity,Travel,N,Savings
+Fidelity,Charity,N,Savings
+Fidelity,Emergency Fund,N,Savings
+Fidelity,Homeowner's Insurance,N,Savings
+Fidelity,Auto Insurance,N,Savings
+Fidelity,Umbrella Insurance,N,Savings
+Fidelity,Caleb Charger,Y,Savings
+Fidelity,Auto Expenses,N,Savings

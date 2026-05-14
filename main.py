@@ -25,6 +25,24 @@ from PyQt6.QtCore import QDate, Qt
 from database import SavingsDatabase
 from models import Account, CategoryType, Category, Transaction, TransactionList, AppSetting
 
+class SortableTableWidgetItem(QTableWidgetItem):
+    """
+    Custom table widget item that implements proper numeric sorting and avoids
+    PyQt6 C++ enum overhead which can cause UI freezes or crashes during sorting.
+    """
+    def __lt__(self, other):
+        if not isinstance(other, QTableWidgetItem):
+            return super().__lt__(other)
+            
+        t1 = self.text().replace(',', '').replace('$', '').strip()
+        t2 = other.text().replace(',', '').replace('$', '').strip()
+        
+        try:
+            return float(t1) < float(t2)
+        except ValueError:
+            return self.text() < other.text()
+
+
 class FastInputTable(QTableWidget):
     """
     Subclasses QTableWidget to intercept tab key presses (cursor navigation).
@@ -398,9 +416,9 @@ class SinkingFundsManager(QMainWindow):
             self.table.setItem(row, 0, self._ro_item(name))
             self.table.setItem(row, 1, self._ro_item(cat.type))
             self.table.setItem(row, 2, self._ro_item(f"{bal:,.2f}", True))
-            self.table.setItem(row, 3, QTableWidgetItem("0.00"))
+            self.table.setItem(row, 3, SortableTableWidgetItem("0.00"))
             self.table.setItem(row, 4, self._ro_item(f"{bal:,.2f}", True))
-            self.table.setItem(row, 5, QTableWidgetItem(""))
+            self.table.setItem(row, 5, SortableTableWidgetItem(""))
             if cat.color:
                 color = QColor(cat.color)
                 if self.table.item(row, 0):
@@ -480,7 +498,7 @@ class SinkingFundsManager(QMainWindow):
         dialog.exec()
 
     def _ro_item(self, text, align_right=False):
-        item = QTableWidgetItem(text)
+        item = SortableTableWidgetItem(text)
         item.setFlags(Qt.ItemFlag.ItemIsEnabled) # Prevent selection & focus completely
         if align_right: item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         return item
