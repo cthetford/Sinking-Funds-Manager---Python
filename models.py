@@ -84,6 +84,10 @@ class Category:
         db.execute("INSERT OR REPLACE INTO d_Categories (account, name, hidden, type) VALUES (?, ?, 'N', ?)", (account, name, type_name))
 
     @staticmethod
+    def update_type(db, account, name, type_name):
+        db.execute("UPDATE d_Categories SET type = ? WHERE account = ? AND name = ?", (type_name, account, name))
+
+    @staticmethod
     def delete(db, account, name):
         db.execute("UPDATE d_Categories SET hidden = 'Y' WHERE account = ? AND name = ?", (account, name))
 
@@ -133,6 +137,33 @@ class TransactionList:
             self.my_db.execute("INSERT INTO Transactions (account, id, create_ts, category, net_change, comment) VALUES (?, ?, ?, ?, ?, ?)", 
                                (self.account, self.latest_id, t.transaction_date.strftime("%Y-%m-%d %H:%M:%S"), t.category, t.amount, t.comment))
         self.transactions.clear()
+
+    @staticmethod
+    def archive_all_records(db, cutoff_date):
+        """Archives transactions prior to cutoff_date and inserts a consolidated starting balance."""
+        db.changed = True
+        db.backup()
+        
+        cutoff_str = cutoff_date.strftime("%Y-%m-%d 00:00:00") if hasattr(cutoff_date, "strftime") else str(cutoff_date)
+        
+        # Calculate sums prior to the cutoff date
+        sql = "SELECT account, category, sum(net_change) as total FROM Transactions WHERE create_ts < ? GROUP BY account, category"
+        balances = db.execute_reader(sql, (cutoff_str,))
+        
+        # Delete old records
+        db.execute("DELETE FROM Transactions WHERE create_ts < ?", (cutoff_str,))
+        
+        # Prepare to insert new records
+        ids = {row["account"]: int(row["max_id"] or 0) for row in db.execute_reader("SELECT account, max(id) as max_id FROM Transactions GROUP BY account")}
+        
+        for row in balances:
+            amt = float(row["total"])
+            if amt != 0:
+                acc = row["account"]
+                cat = row["category"]
+                ids[acc] = ids.get(acc, 0) + 1
+                db.execute("INSERT INTO Transactions (account, id, create_ts, category, net_change, comment) VALUES (?, ?, ?, ?, ?, ?)",
+                           (acc, ids[acc], cutoff_str, cat, amt, "Archived Starting Balance"))
 
 class AppSetting:
     @staticmethod

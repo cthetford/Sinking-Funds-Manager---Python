@@ -143,6 +143,7 @@ class CategoriesDialog(QDialog):
         self.resize(400, 300)
         layout = QVBoxLayout(self)
         self.cat_list = QListWidget()
+        self.cat_list.itemSelectionChanged.connect(self.on_category_selected)
         layout.addWidget(self.cat_list)
         
         self.new_cat_input = QLineEdit()
@@ -152,6 +153,8 @@ class CategoriesDialog(QDialog):
         
         btn_add = QPushButton("Add")
         btn_add.clicked.connect(self.add_category)
+        btn_update = QPushButton("Update Type")
+        btn_update.clicked.connect(self.update_category)
         btn_del = QPushButton("Delete")
         btn_del.clicked.connect(self.del_category)
         
@@ -159,9 +162,19 @@ class CategoriesDialog(QDialog):
         row1.addWidget(self.new_cat_input); row1.addWidget(self.cat_type_combo)
         layout.addLayout(row1)
         row2 = QHBoxLayout()
-        row2.addWidget(btn_add); row2.addWidget(btn_del)
+        row2.addWidget(btn_add); row2.addWidget(btn_update); row2.addWidget(btn_del)
         layout.addLayout(row2)
         self.refresh_categories()
+
+    def on_category_selected(self):
+        item = self.cat_list.currentItem()
+        if item:
+            text = item.text()
+            if " [" in text:
+                name, t = text.split(" [")
+                t = t.rstrip("]")
+                self.new_cat_input.setText(name)
+                self.cat_type_combo.setCurrentText(t)
 
     def refresh_categories(self):
         self.cat_list.clear()
@@ -172,6 +185,12 @@ class CategoriesDialog(QDialog):
         if self.new_cat_input.text(): 
             Category.add(self.db, self.account_name, self.new_cat_input.text(), self.cat_type_combo.currentText())
             self.new_cat_input.clear()
+            self.refresh_categories()
+
+    def update_category(self):
+        if self.cat_list.currentItem():
+            name = self.cat_list.currentItem().text().split(" [")[0]
+            Category.update_type(self.db, self.account_name, name, self.cat_type_combo.currentText())
             self.refresh_categories()
 
     def del_category(self):
@@ -291,6 +310,50 @@ class GeneralSettingsDialog(QDialog):
         AppSetting.set(self.db, 'backup_retention_days', self.retention_spin.value())
         self.accept()
 
+class ArchiveDialog(QDialog):
+    """
+    Prompts the user for a cutoff date and executes the database archival process.
+    """
+    def __init__(self, db, parent=None):
+        super().__init__(parent)
+        self.db = db
+        self.setWindowTitle("Archive Old Records")
+        self.resize(350, 200)
+        layout = QVBoxLayout(self)
+        
+        lbl_warn = QLabel("<b>Warning:</b> This will permanently consolidate transactions prior to the selected date into a single 'Archived Starting Balance'.<br><br>A backup of the database will be created automatically before this destructive action.")
+        lbl_warn.setWordWrap(True)
+        layout.addWidget(lbl_warn)
+        
+        form_layout = QHBoxLayout()
+        form_layout.addWidget(QLabel("Archive records prior to:"))
+        self.date_edit = QDateEdit(calendarPopup=True)
+        self.date_edit.setDate(QDate.currentDate())
+        form_layout.addWidget(self.date_edit)
+        layout.addLayout(form_layout)
+        
+        btn_layout = QHBoxLayout()
+        btn_archive = QPushButton("Archive Now")
+        btn_archive.clicked.connect(self.archive_records)
+        btn_cancel = QPushButton("Cancel")
+        btn_cancel.clicked.connect(self.reject)
+        btn_layout.addStretch()
+        btn_layout.addWidget(btn_archive)
+        btn_layout.addWidget(btn_cancel)
+        layout.addLayout(btn_layout)
+
+    def archive_records(self):
+        reply = QMessageBox.question(self, 'Confirm Archival', 
+                                     "Are you absolutely sure you want to archive old records? This cannot be undone from the app without manually restoring the backup file.",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                                     QMessageBox.StandardButton.No)
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            archive_date = self.date_edit.date().toPyDate()
+            TransactionList.archive_all_records(self.db, archive_date)
+            QMessageBox.information(self, "Success", "Archival completed successfully!")
+            self.accept()
+
 class SinkingFundsManager(QMainWindow):
     """
     The Core application window routing context menus, primary spreadsheet
@@ -320,17 +383,25 @@ class SinkingFundsManager(QMainWindow):
         tools.addSeparator()
         tools.addAction("Manage Visibility (Hide/Unhide)").triggered.connect(self.open_manage_visibility)
         tools.addSeparator()
+        tools.addAction("Archive Old Records...").triggered.connect(self.open_archive_dialog)
+        tools.addSeparator()
         tools.addAction("General Settings").triggered.connect(self.open_general_settings)
 
         help_menu = menubar.addMenu("Help")
         help_menu.addAction("About").triggered.connect(self.show_about)
 
     def show_about(self):
+        try:
+            count = self.db.execute_reader("SELECT COUNT(*) as count FROM Transactions")[0]["count"]
+        except Exception:
+            count = 0
+            
         about_text = (
             "<h2>Sinkin Funds Manager</h2>"
             "<p><b>Version:</b> 2.0<br/>"
             "<b>Created by:</b> Curtis Thetford<br/>"
-            "<b>Date:</b> May 14, 2026</p>"
+            "<b>Date:</b> May 14, 2026<br/>"
+            f"<b>Total Transactions:</b> {count:,}</p>"
             "<p>This program is free software: you can redistribute it and/or modify "
             "it under the terms of the GNU General Public License as published by "
             "the Free Software Foundation, either version 3 of the License, or "
@@ -344,6 +415,9 @@ class SinkingFundsManager(QMainWindow):
 
     def open_manage_visibility(self): ManageVisibilityDialog(self.db, self).exec(); self.load_accounts()
     def open_general_settings(self): GeneralSettingsDialog(self.db, self).exec()
+    def open_archive_dialog(self): 
+        ArchiveDialog(self.db, self).exec()
+        self.on_account_changed(self.current_account)
 
     def setup_top_bar(self):
         layout = QHBoxLayout()

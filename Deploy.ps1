@@ -2,7 +2,6 @@
 .SYNOPSIS
     Builds the Sinking Funds Manager into a standalone executable.
 #>
-
 Write-Host "Installing requirements..." -ForegroundColor Cyan
 pip install pyinstaller PyQt6
 
